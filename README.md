@@ -3,8 +3,11 @@
 A simple library to read key value paired text files and inject the values automatically into the bean properties.
 
 ####A sample properties file (config.properties)
+
+```
 name=Fiona
 age=16
+```
 
 The file is located under src/main/resources/
 
