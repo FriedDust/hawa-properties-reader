@@ -18,13 +18,13 @@ import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.inject.spi.InjectionTarget;
 import javax.enterprise.inject.spi.ProcessInjectionTarget;
+import javax.inject.Inject;
 
 import com.friedust.hawaproperties.annotation.PropertySource;
 import com.friedust.hawaproperties.annotation.PropertyValue;
 
 /**
- * CDI extension to read properties file from classpath/filesystem
- * mentioned in {@link PropertySource} and inject the values in attributes
+ * CDI extension to read properties file from classpath/filesystem mentioned in {@link PropertySource} and inject the values in attributes
  * annotated with {@link PropertyValue}
  * 
  * @author frieddust
@@ -34,6 +34,7 @@ public class HawaPropertiesExtension implements Extension {
 
     public <T> void initializePropertyLoading(@Observes ProcessInjectionTarget<T> pit) {
         AnnotatedType<T> at = pit.getAnnotatedType();
+
         if (!at.isAnnotationPresent(PropertySource.class)) {
             return;
         }
@@ -43,7 +44,7 @@ public class HawaPropertiesExtension implements Extension {
 
         Properties properties = loadProperties(filename);
 
-        Map<Field, String> fieldAndValues = loadValues(at, properties);
+        Map<Field, String> fieldAndValues = loadValues(at.getJavaClass().getDeclaredFields(), properties);
 
         InjectionTarget<T> newInjectionTarget = inject(pit, fieldAndValues);
         pit.setInjectionTarget(newInjectionTarget);
@@ -126,15 +127,13 @@ public class HawaPropertiesExtension implements Extension {
         }
     }
 
-    private <T> Map<Field, String> loadValues(AnnotatedType<T> annotatedType, Properties properties) {
-        Set<AnnotatedField<? super T>> fields = annotatedType.getFields();
+    private <T> Map<Field, String> loadValues(Field[] fields, Properties properties) {
         Map<Field, String> fieldAndValues = new HashMap<Field, String>();
 
-        for (AnnotatedField<?> annotatedField : fields) {
-            if (annotatedField.isAnnotationPresent(PropertyValue.class)) {
-                String attrKey = annotatedField.getAnnotation(PropertyValue.class).value();
+        for (Field field : fields) {
+            if (field.isAnnotationPresent(PropertyValue.class)) {
+                String attrKey = field.getAnnotation(PropertyValue.class).value();
 
-                Field field = annotatedField.getJavaMember();
                 String value = (String) properties.get(attrKey);
                 fieldAndValues.put(field, value);
             }
