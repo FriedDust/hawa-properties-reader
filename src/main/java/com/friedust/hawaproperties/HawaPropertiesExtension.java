@@ -136,7 +136,6 @@ public class HawaPropertiesExtension implements Extension {
 
                 Field field = annotatedField.getJavaMember();
                 String value = (String) properties.get(attrKey);
-                System.out.println("val: " + value);
                 fieldAndValues.put(field, value);
             }
         }
