@@ -23,6 +23,9 @@ import com.friedust.hawaproperties.annotation.PropertySource;
 import com.friedust.hawaproperties.annotation.PropertyValue;
 
 /**
+ * CDI extension to read properties file from classpath/filesystem
+ * mentioned in {@link PropertySource} and inject the values in attributes
+ * annotated with {@link PropertyValue}
  * 
  * @author frieddust
  *
